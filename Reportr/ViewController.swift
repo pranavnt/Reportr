@@ -6,10 +6,14 @@
 //  Copyright © 2020 Pranav Teegavarapu. All rights reserved.
 //
 
+let message: String = "Hello, \n \n I have just faced police brutality when peacefully protesting. I was attending a protest at 23475 NE Novelty Hill Rd, Redmond, WA 98053 at 9PM on June 6th, 2020. I have attached a video of this incident to this email. \n  \n Thank you, \n Pranav"
+
+public var VideoData: Data?;
 
 import UIKit
 import MobileCoreServices
 import MessageUI
+
 
 class ViewController: UIViewController, UINavigationControllerDelegate, UIImagePickerControllerDelegate  {
     var controller = UIImagePickerController()
@@ -37,8 +41,25 @@ class ViewController: UIViewController, UINavigationControllerDelegate, UIImageP
         present(controller, animated: true, completion: nil)
     }
     
-    @IBAction func sendMail(_ sender: UIButton) {
+    func showMailComposer() {
+        guard MFMailComposeViewController.canSendMail() else {
+            print(1)
+            //Show alert informing the user
+            return
+        }
+        let composer = MFMailComposeViewController()
+        composer.mailComposeDelegate = self
+        composer.setToRecipients(["RepDelBene@mail.house.gov",])
+        composer.setSubject("Reporting Police Brutality")
+        composer.addAttachmentData(VideoData!, mimeType: ".mp4", fileName: "./video.mp4")
+        composer.setMessageBody(message, isHTML: false)
         
+        present(composer, animated: true)
+    }
+    
+    
+    @IBAction func sendMail(_ sender: UIButton) {
+        showMailComposer()
     }
     
     override func viewDidLoad() {
@@ -56,6 +77,8 @@ class ViewController: UIViewController, UINavigationControllerDelegate, UIImageP
             UISaveVideoAtPathToSavedPhotosAlbum(selectedVideo.relativePath, self, selectorToCall, nil)
             
             let videoData = try? Data(contentsOf: selectedVideo)
+            print("test")
+            VideoData = videoData
             let paths = NSSearchPathForDirectoriesInDomains(
                 FileManager.SearchPathDirectory.documentDirectory, FileManager.SearchPathDomainMask.userDomainMask, true)
             let documentsDirectory: URL = URL(fileURLWithPath: paths[0])
@@ -75,4 +98,28 @@ class ViewController: UIViewController, UINavigationControllerDelegate, UIImageP
     }
 }
 
-
+extension ViewController: MFMailComposeViewControllerDelegate {
+    
+    func mailComposeController(_ controller: MFMailComposeViewController, didFinishWith result: MFMailComposeResult, error: Error?) {
+        
+        if let _ = error {
+            controller.dismiss(animated: true)
+            return
+        }
+        
+        switch result {
+        case .cancelled:
+            print("Cancelled")
+        case .failed:
+            print("Failed to send")
+        case .saved:
+            print("Saved")
+        case .sent:
+            print("Email Sent")
+        @unknown default:
+            break
+        }
+        
+        controller.dismiss(animated: true)
+    }
+}

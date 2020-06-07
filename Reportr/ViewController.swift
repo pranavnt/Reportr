@@ -6,8 +6,6 @@
 //  Copyright © 2020 Pranav Teegavarapu. All rights reserved.
 //
 
-let message: String = "Hello, \n \n I have just faced police brutality when peacefully protesting. I was attending a protest at 23475 NE Novelty Hill Rd, Redmond, WA 98053 at 9PM on June 6th, 2020. I have attached a video of this incident to this email. \n  \n Thank you, \n Pranav"
-
 public var VideoData: Data?;
 
 import UIKit
